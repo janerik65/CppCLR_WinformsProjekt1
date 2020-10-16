@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Form1.h"
 #include <math.h>
+#include "SimBase.h"
 
 //System::Void Integrer_Click(System::Object^ sender, System::EventArgs^ e) {
 //};
@@ -208,9 +209,9 @@ System::Void CppCLRWinformsProjekt::Form1::ChinesePopulation_Click(System::Objec
 		arrState_pension_fond[i] = State_pension_fond;
 
 		//TEST jeh
-		double dSinus = sin(t);
+		/*double dSinus = sin(t);
 		arrState_pension_fond[i] = dSinus;
-		arrCosinus[i] = cos(t);
+		arrCosinus[i] = cos(t);*/
 
 		//: l Adult_fertile(t) = Adult_fertile(t - dt) + (Growing_up - No_more_children - Adult_fertile_death) * dt { CONVEYOR }
 		Adult_fertile += (Growing_up - No_more_children - Adult_fertile_death) * dt;
@@ -262,14 +263,18 @@ System::Void CppCLRWinformsProjekt::Form1::ChinesePopulation_Click(System::Objec
 	double STARTTIME = 0;
 	double STOPTIME = 200;
 
-	Display2(tArr, arrState_pension_fond, arrCosinus, NO_OF_STEPS_TO_STORE);
+	/*Display2(tArr, arrState_pension_fond, arrCosinus, NO_OF_STEPS_TO_STORE);*/
+	Display2(tArr, arrState_pension_fond, NO_OF_STEPS_TO_STORE);
 	return System::Void();
 }
 
 bool CppCLRWinformsProjekt::Form1::Display2(double d2dArr[2][NO_OF_STEPS_TO_STORE])
 {
 	//int len = sizeof(2d2Arr[0]);
-	for (int i = 0; i < 4; i++) {
+	//TEST jeh
+	//double arrZZZ[2][5]{ {1,2,3,4,5},{0,1.2,3.5,6,2} };
+
+	for (int i = 0; i < NO_OF_STEPS_TO_STORE; i++) {
 		this->chart1->Series["Age"]->Points->AddXY(d2dArr[0][i], d2dArr[1][i]);
 	}
 	return false;
@@ -302,6 +307,14 @@ bool CppCLRWinformsProjekt::Form1::Display2(double dXArr[NO_OF_STEPS_TO_STORE], 
 
 System::Void CppCLRWinformsProjekt::Form1::jeh_Click(System::Object^ sender, System::EventArgs^ e)
 {
+	//TEST
+	double dArr[2][NO_OF_STEPS_TO_STORE];
+	SimBase^ sim = gcnew(SimBase);
+	sim->PopultaionSim(dArr);
+	//Display som graf
+	bool bNyOK=Display2(dArr);
+	return System::Void();
+
 	//INTEGRATION = EULER
 	//RUNMODE = NORMAL
 	//{ INITIALIZATION EQUATIONS }
@@ -329,5 +342,6 @@ System::Void CppCLRWinformsProjekt::Form1::jeh_Click(System::Object^ sender, Sys
 		Y1Akse[t] = Population;
 	}
 
+	bool bOKk = Display2(xAkse, Y1Akse, 200);
 	return System::Void();
 }
