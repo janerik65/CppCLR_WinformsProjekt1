@@ -7,58 +7,85 @@ bool SimBase::PopultaionSim(double dXArr[2][NO_OF_STEPS_TO_STORE])
 {
 	const int CHILD_YEAR = 17;
 	const int AFERTIL_YEAR = 42;
-	const float BIRTH_RATE = 0.03f;
+	const int ANOTF_YEAR = 10;
+	const int ELDERS_YEAR = 35;
+
+	const float INIT_CHILD_POP = 400.;
+	const float INIT_AFERTIL_POP = 300;
+	const float INIT_ANOTF_POP = 30.;
+	const float INIT_ELDERS_POP = 70.;
+
+	const float BIRTH_RATE = 0.03;
+	const float CHILD_DEATH_RATE = 0.06;
+	const float AFERTIL_DEATH_RATE = 0.16;
+	const float ANOTF_DEATH_RATE = 0.14;
+	const float ELDERS_DEATH_RATE = 0.76;
 
 	//Lagringsstrukturer
 	float arrChild[CHILD_YEAR]{};
 	float arrAFertil[AFERTIL_YEAR]{};
+	float arrANotF[ANOTF_YEAR]{};
+	float arrElders[ELDERS_YEAR]{};
+
 
 	float popChild{};
 	float popFAdult{};
+	float popANotF{};
+	float popElders{};
 	float popTot{};
 
-	double TEST;
-	TEST = 41 / 2;
-	TEST = 41 / 2.f;
-	TEST = 41.5 * (1. / 2.);
+	//Init population, fordele dem likt på årene
+	for (int ix = 0; ix < CHILD_YEAR; ix++) arrChild[ix] = INIT_CHILD_POP / CHILD_YEAR;
+	for (int ix = 0; ix < AFERTIL_YEAR; ix++) arrAFertil[ix] = INIT_AFERTIL_POP / AFERTIL_YEAR;
+	for (int ix = 0; ix < ANOTF_YEAR; ix++) arrANotF[ix] = INIT_ANOTF_POP / ANOTF_YEAR;
+	for (int ix = 0; ix < ELDERS_YEAR; ix++) arrElders[ix] = INIT_ELDERS_POP / ELDERS_YEAR;
 
-	//Init population
-	for (int ix = 0; ix < CHILD_YEAR; ix++) arrChild[ix] = 400.0f/17.0f;
-	for (int ix = 0; ix < AFERTIL_YEAR; ix++) arrAFertil[ix] = 300.04/42.0f;
-	
-
-	//Summerer 
+	//Summerer populasjon for hver gruppe
 	for (int ix = 0; ix < CHILD_YEAR; ix++) 	popChild  += arrChild[ix];
 	for (int ix = 0; ix < AFERTIL_YEAR; ix++)	popFAdult += arrAFertil[ix];
-	popTot = popChild + popFAdult;
+	for (int ix = 0; ix < ANOTF_YEAR; ix++)		popANotF  += arrANotF[ix];
+	for (int ix = 0; ix < ELDERS_YEAR; ix++)	popElders += arrElders[ix];
+	popTot = popChild + popFAdult + popANotF + popElders;
 
 	//Simulerings -loop
 	for (int ix = 0; ix < NO_OF_STEPS_TO_STORE; ix++) {
 		
+		//Ta vare på siste element i hvert array før en skifter en til høyre (untatt Elders, de blir bare borte)
+		float NyAFertil = arrChild[CHILD_YEAR - 1];
+		float NyANotF	= arrAFertil[AFERTIL_YEAR - 1];
+		float NyElders	= arrANotF[ANOTF_YEAR - 1];
+
 		//Shift arrayene ett år oppover og beregner nyfødte
-		float NyAdult = arrChild[CHILD_YEAR - 1];
 		for (int ixc = CHILD_YEAR-1; ixc > 0; ixc--) arrChild[ixc] = arrChild[ixc-1];
 		for (int ixa = AFERTIL_YEAR-1; ixa > 0; ixa--) arrAFertil[ixa] = arrAFertil[ixa-1];
-		arrAFertil[0] = NyAdult;
+		for (int ixa = ANOTF_YEAR - 1; ixa > 0; ixa--) arrANotF[ixa] = arrANotF[ixa - 1];
+		for (int ixa = ELDERS_YEAR - 1; ixa > 0; ixa--) arrElders[ixa] = arrElders[ixa - 1];
+
+		//Sett inn nye data først i hvert array (hver gruppe)
 		arrChild[0] = BIRTH_RATE* popFAdult;
+		arrAFertil[0] = NyAFertil;
+		arrANotF[0] = NyANotF;
+		arrElders[0] = NyElders;
 
 		//Dødlighet. 16% dør før de blir voksne. 20% av de voksne dør før de blir infertile
-		for (int ix = 0; ix < CHILD_YEAR; ix++) arrChild[ix] -= arrChild[ix]*(0.16f/17.0f);
-		for (int ix = 0; ix < AFERTIL_YEAR; ix++) arrAFertil[ix] -= arrAFertil[ix] * (0.2f / AFERTIL_YEAR);
+		for (int ix = 0; ix < CHILD_YEAR; ix++) arrChild[ix] -= arrChild[ix]*(CHILD_DEATH_RATE/CHILD_YEAR);
+		for (int ix = 0; ix < AFERTIL_YEAR; ix++) arrAFertil[ix] -= arrAFertil[ix] * (AFERTIL_DEATH_RATE/AFERTIL_YEAR);
+		for (int ix = 0; ix < ANOTF_YEAR; ix++) arrANotF[ix] -= arrANotF[ix] * (ANOTF_DEATH_RATE / ANOTF_YEAR);
+		for (int ix = 0; ix < ELDERS_YEAR; ix++) arrElders[ix] -= arrElders[ix] * (ELDERS_DEATH_RATE / ELDERS_YEAR);
 
 		//Beregner populasjonen ved å summere årsklassene
-		popChild = popFAdult = 0;
+		popChild = popFAdult = popANotF = popElders = 0;
 		for (int ix = 0; ix < CHILD_YEAR; ix++) 	popChild += arrChild[ix];
 		for (int ix = 0; ix < AFERTIL_YEAR; ix++)	popFAdult += arrAFertil[ix];
-		popTot = popChild + popFAdult;
+		for (int ix = 0; ix < ANOTF_YEAR; ix++)	popANotF += arrANotF[ix];
+		for (int ix = 0; ix < ELDERS_YEAR; ix++)	popElders += arrElders[ix];
+		popTot = popChild + popFAdult + popANotF + popElders;
 
 		//Lagre i arrayet som returneres
 		dXArr[0][ix] = ix;
-		dXArr[1][ix] = popChild;
+		dXArr[1][ix] = popElders;
 		int venteidebugger = ix;
 	}
-
-
 	return true;
 }//END SimBase::PopultaionSim
 
