@@ -13,8 +13,8 @@ System::Void CppCLRWinformsProjekt::Form1::Integrer_Click(System::Object^ sender
 {
 	//TODO: Sett riktig verdi på konstantene (hvis de er konstanter?)
 	//Constants
-	const double LEAKAGE_OUTFLOW = 15;
-	const double CONVEYOR_OUTFLOW = 13;
+	const double LEAKAGE_OUTFLOW = 17;
+	const double CONVEYOR_OUTFLOW = 12;
 
 	//INIT values
 	//People
